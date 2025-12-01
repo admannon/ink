@@ -125,8 +125,13 @@ test('Thai text wrapping forces line breaks', t => {
 	);
 
 	// Should wrap into at least 2 lines
-	const lines = output.split('\n').filter(line => line.length > 0);
-	t.true(lines.length >= 2, 'Thai text should wrap into at least 2 lines');
+	const lines = output.split('\n');
+	// Count non-empty lines to verify wrapping occurred
+	const nonEmptyLines = lines.filter(line => line.length > 0);
+	t.true(
+		nonEmptyLines.length >= 2,
+		'Thai text should wrap into at least 2 lines',
+	);
 
 	// Verify each line doesn't exceed box width
 	for (const line of lines) {

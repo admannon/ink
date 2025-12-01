@@ -91,3 +91,49 @@ test('Unicode marks wrapping in narrow box', t => {
 	const {width} = measureStyledChars(toStyledCharacters(textWithMarks));
 	t.is(width, 23);
 });
+
+test('Thai text wrapping in narrow box', t => {
+	const thaiText = 'พี่พี่พี่พี่พี่พี่'; // 6 repetitions of "พี่"
+	const boxWidth = 10;
+
+	const output = renderToString(
+		<Box width={boxWidth}>
+			<Text>{thaiText}</Text>
+		</Box>,
+	);
+
+	// Verify text wraps correctly and doesn't overflow
+	const lines = output.split('\n');
+	for (const line of lines) {
+		const {width} = measureStyledChars(toStyledCharacters(line));
+		t.true(
+			width <= boxWidth,
+			`Line "${line}" has width ${width} which exceeds box width ${boxWidth}`,
+		);
+	}
+});
+
+test('Thai text wrapping forces line breaks', t => {
+	// 12 repetitions of "พี่" = width 12, must wrap when box width is 10
+	const thaiText = 'พี่พี่พี่พี่พี่พี่พี่พี่พี่พี่พี่พี่';
+	const boxWidth = 10;
+
+	const output = renderToString(
+		<Box width={boxWidth}>
+			<Text>{thaiText}</Text>
+		</Box>,
+	);
+
+	// Should wrap into at least 2 lines
+	const lines = output.split('\n').filter(line => line.length > 0);
+	t.true(lines.length >= 2, 'Thai text should wrap into at least 2 lines');
+
+	// Verify each line doesn't exceed box width
+	for (const line of lines) {
+		const {width} = measureStyledChars(toStyledCharacters(line));
+		t.true(
+			width <= boxWidth,
+			`Line "${line}" has width ${width} which exceeds box width ${boxWidth}`,
+		);
+	}
+});
